@@ -1,0 +1,171 @@
+﻿@using System.ComponentModel.DataAnnotations
+@* @using Microsoft.AspNetCore.Components
+@using System.Globalization; *@
+    <h3>افزودن کالا</h3>
+    @page "/commodity"
+
+
+
+    @* <MudGrid>
+    <MudItem xs="12">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12</MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12 sm=6</MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12 sm=6</MudPaper>
+    </MudItem>
+    <MudItem xs="6" sm="3">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6 sm=3</MudPaper>
+    </MudItem>
+    <MudItem xs="6" sm="3">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6 sm=3</MudPaper>
+    </MudItem>
+    <MudItem xs="6" sm="3">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6 sm=3</MudPaper>
+    </MudItem>
+    <MudItem xs="6" sm="3">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6 sm=3</MudPaper>
+    </MudItem>
+</MudGrid> *@
+
+
+
+    <MudGrid>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudTextField @bind-Value="TextValue" Label="کالا" Variant="Variant.Text" Required="true"
+                    RequiredError="نام کالا الزامیست">
+                </MudTextField>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <div>
+                
+                    <MudTextField @bind-Value="@SelectedValue" TextUpdateSuppression=false Label="نام دسته بندی" Variant="Variant.Text" Required
+                        ReadOnly="true" RequiredError="نام دسته بندی الزامیست"/>
+                    <MudTreeView Hover ReadOnly="false" @bind-SelectedValue="@SelectedValue" Required="true">
+                        <MudTreeViewItem Value="@("بازی")">
+                            <MudTreeViewItem Value='"بردگیم"' />
+                            <MudTreeViewItem Value='"ویدیوگیم"' />
+                        </MudTreeViewItem>
+                    </MudTreeView>
+                </div>
+
+            </MudPaper>
+
+
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudSelect @bind-Value="_selectedName" Label="نام برند" Variant="Variant.Text" Required RequiredError="نام برند الزامیست">
+    @foreach (var name in _name)
+    {
+        <MudSelectItem Value="@name">@name</MudSelectItem>
+    }
+</MudSelect>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudTextField @bind-Value="TextValueT" Label="نام تامین کننده" Variant="Variant.Text">
+                </MudTextField>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudNumericField HideSpinButtons="true" @bind-Value="intValue" Label="موجودی" Variant="Variant.Text"
+                    Min="0" Required="true" RequiredError="موجودی الزامیست"/>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudNumericField HideSpinButtons="true" @bind-Value="intValuep" Label="قیمت (ریال)"
+                    Variant="Variant.Text" Min="0" Required="true" Adornment="Adornment.End" AdornmentText="ریال" RequiredError="قیمت الزامیست"/>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4">
+        @* <div class="" dir="ltr">
+        <label dir="ltr" style="direction: ltr !important;">Email</label> *@
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudTextField T="string" Label="ایمیل" Required="true" RequiredError="ایمیل الزامیست"
+                              Validation="@(new EmailAddressAttribute() {ErrorMessage = "ایمیل نامعتبر است"})" InputType="InputType.Email"/>
+            </MudPaper>
+        @* </div> *@
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudDatePicker Label="تاریخ شروع نمایش" Editable="true" @bind-Date="_dates" Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="از" Variant="Variant.Outlined" />
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudDatePicker Label="تاریخ پایان نمایش" Editable="true" @bind-Date="_datef" Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="تا" Variant="Variant.Outlined" />
+            </MudPaper>
+           
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+            <MudTextField @bind-Value="_filep" Label="تصویر کالا" Variant="Variant.Text" TextUpdateSuppression=false ReadOnly Required RequiredError="تصویر کالا الزامیست">
+                </MudTextField>
+                <MudFileUpload T="IBrowserFile" Required="true" FilesChanged="UploadFilep">
+    <ActivatorContent>
+        <MudFab Color="Color.Primary" EndIcon="@Icons.Material.Filled.CloudUpload" Size="Size.Small"/>
+    </ActivatorContent>
+    @* <SelectedTemplate>
+        @if (context != null)
+        {
+            <MudText>@context.Name</MudText>
+        }
+    </SelectedTemplate> *@
+</MudFileUpload>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudTextField @bind-Value="_file" Label="کاتالوگ کالا" Variant="Variant.Text" TextUpdateSuppression=false ReadOnly >
+                </MudTextField>
+                <MudFileUpload T="IBrowserFile" Required="true" FilesChanged="UploadFiles">
+    <ActivatorContent>
+        <MudFab Color="Color.Primary" EndIcon="@Icons.Material.Filled.CloudUpload" Size="Size.Small"/>
+    </ActivatorContent>
+</MudFileUpload>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudColorPicker Label="رنگ بندی محصول" @bind-Text="_colorValue" Style="@($"color: {_colorValue};")" Placeholder="انتخاب رنگ" />
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+
+@code {
+    public string TextValue { get; set; }
+    public string TextValueT { get; set; }
+    public bool ReadOnly = true;
+    public bool Hover = true;
+    public string SelectedValue;
+    public int? intValue;
+    public int? intValuep;
+    private DateTime? _dates = null;
+    private DateTime? _datef = null;
+    private string _filep = null;
+    private string _file = null;
+    private void UploadFilep(IBrowserFile file)
+    {
+        _filep = file.Name;
+    }
+    private void UploadFiles(IBrowserFile file)
+    {
+        _file = file.Name;
+    }
+     private string _colorValue;
+      private string _selectedName;
+    private readonly string[] _name =
+    [
+        "دهکده بردگیم", "چارپایه", "فان تایمز"
+    ];
+}
