@@ -1,52 +1,29 @@
 ﻿@using System.ComponentModel.DataAnnotations
-@* @using Microsoft.AspNetCore.Components
-@using System.Globalization; *@
-    <h3>افزودن کالا</h3>
-    @page "/commodity"
+@using System.Globalization
+@using System.Reflection
+@inject ISnackbar Snackbar
+<h3>افزودن کالا</h3>
+@page "/commodity"
 
 
+<MudPaper Class="d-flex align-center justify-center mud-width-full py-8 p-3">
+    <MudForm @ref="form">
+        <MudGrid>
+            <MudItem xs="4">
 
-    @* <MudGrid>
-    <MudItem xs="12">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12</MudPaper>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12 sm=6</MudPaper>
-    </MudItem>
-    <MudItem xs="12" sm="6">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=12 sm=6</MudPaper>
-    </MudItem>
-    <MudItem xs="6" sm="3">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6 sm=3</MudPaper>
-    </MudItem>
-    <MudItem xs="6" sm="3">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6 sm=3</MudPaper>
-    </MudItem>
-    <MudItem xs="6" sm="3">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6 sm=3</MudPaper>
-    </MudItem>
-    <MudItem xs="6" sm="3">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=6 sm=3</MudPaper>
-    </MudItem>
-</MudGrid> *@
-
-
-
-    <MudGrid>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-                <MudTextField @bind-Value="TextValue" Label="کالا" Variant="Variant.Text" Required="true"
+                <MudTextField @bind-Value="model.TextValue" Label="کالا" Variant="Variant.Text" Required="true"
                     RequiredError="نام کالا الزامیست">
                 </MudTextField>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+
+            </MudItem>
+            <MudItem xs="4">
+
                 <div>
-                
-                    <MudTextField @bind-Value="@SelectedValue" TextUpdateSuppression=false Label="نام دسته بندی" Variant="Variant.Text" Required
-                        ReadOnly="true" RequiredError="نام دسته بندی الزامیست"/>
-                    <MudTreeView Hover ReadOnly="false" @bind-SelectedValue="@SelectedValue" Required="true">
+
+                    <MudTextField @bind-Value="@model.SelectedValue" TextUpdateSuppression=false Label="نام دسته بندی"
+                        Variant="Variant.Text" Required="true" ReadOnly="true" RequiredError="نام دسته بندی الزامیست"
+                        For="@(() => model.SelectedValue)" />
+                    <MudTreeView Hover ReadOnly="false" @bind-SelectedValue="@model.SelectedValue" Required="true">
                         <MudTreeViewItem Value="@("بازی")">
                             <MudTreeViewItem Value='"بردگیم"' />
                             <MudTreeViewItem Value='"ویدیوگیم"' />
@@ -54,118 +31,380 @@
                     </MudTreeView>
                 </div>
 
-            </MudPaper>
 
 
-        </MudItem>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-                <MudSelect @bind-Value="_selectedName" Label="نام برند" Variant="Variant.Text" Required RequiredError="نام برند الزامیست">
-    @foreach (var name in _name)
-    {
-        <MudSelectItem Value="@name">@name</MudSelectItem>
-    }
-</MudSelect>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-                <MudTextField @bind-Value="TextValueT" Label="نام تامین کننده" Variant="Variant.Text">
+
+            </MudItem>
+            <MudItem xs="4">
+
+                <MudSelect @bind-Value="model._selectedName" Label="نام برند" Variant="Variant.Text" Required
+                    RequiredError="نام برند الزامیست" For="@(() => model._selectedName)">
+                    @foreach (var name in _name)
+                    {
+                        <MudSelectItem Value="@name">@name</MudSelectItem>
+                    }
+                </MudSelect>
+
+            </MudItem>
+            <MudItem xs="4">
+
+                <MudTextField @bind-Value="model.TextValueT" Label="نام تامین کننده" Variant="Variant.Text">
                 </MudTextField>
-            </MudPaper>
+
+            </MudItem>
+            <MudItem xs="4">
+
+                <MudNumericField HideSpinButtons="true" @bind-Value="model.intValue" Label="موجودی"
+                    Variant="Variant.Text" Min="0" Required="true" RequiredError="موجودی الزامیست" />
+
+            </MudItem>
+            <MudItem xs="4">
+
+                <MudNumericField HideSpinButtons="true" @bind-Value="model.intValuep" Label="قیمت (ریال)"
+                    Variant="Variant.Text" Min="0" Required="true" Adornment="Adornment.End" AdornmentText="ریال"
+                    RequiredError="قیمت الزامیست" />
+
+            </MudItem>
+            <MudItem xs="4">
+                <MudTextField T="string" Label="ایمیل"
+                    Validation="@(new EmailAddressAttribute() {ErrorMessage = "ایمیل نامعتبر است"})"
+                    InputType="InputType.Email" @bind-Value="model.email" />
+
+
+            </MudItem>
+            <MudItem xs="4">
+
+                <MudDatePicker Label="تاریخ شروع نمایش" Editable="true" @bind-Date="model._dates"
+                    Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="از"
+                    Variant="Variant.Outlined" Culture="@GetPersianCulture()" />
+
+            </MudItem>
+            <MudItem xs="4">
+
+                <MudDatePicker Label="تاریخ پایان نمایش" Editable="true" @bind-Date="model._datef"
+                    Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="تا"
+                    Variant="Variant.Outlined" Culture="@GetPersianCulture()" Validation="Dates" />
+
+
+            </MudItem>
+            <MudItem xs="4">
+                <div Class="d-flex align-center justify-center mud-width-full py-8">
+                    <MudTextField @bind-Value="model._filep" Label="تصویر کالا" Variant="Variant.Text"
+                        TextUpdateSuppression=false ReadOnly Required RequiredError="تصویر کالا الزامیست">
+                    </MudTextField>
+                    <MudFileUpload T="IBrowserFile" FilesChanged="@(async file => await HandleFileChange(file))">
+                        <ActivatorContent>
+                            <MudFab Color="Color.Primary" EndIcon="@Icons.Material.Filled.CloudUpload"
+                                Size="Size.Small" />
+                        </ActivatorContent>
+                    </MudFileUpload>
+                </div>
+            </MudItem>
+            <MudItem xs="4">
+                <div Class="d-flex align-center justify-center mud-width-full py-8">
+                    <MudTextField @bind-Value="model._file" Label="کاتالوگ کالا" Variant="Variant.Text"
+                        TextUpdateSuppression=false ReadOnly>
+                    </MudTextField>
+                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                        <ActivatorContent>
+                            <MudFab Color="Color.Primary" EndIcon="@Icons.Material.Filled.CloudUpload"
+                                Size="Size.Small" />
+                        </ActivatorContent>
+                    </MudFileUpload>
+                </div>
+            </MudItem>
+            <MudItem xs="4">
+
+                <MudColorPicker Label="رنگ بندی محصول" @bind-Text="model._colorValue"
+                    Style="@($"color: {model._colorValue};")" Placeholder="انتخاب رنگ" />
+
+            </MudItem>
+
+        </MudGrid>
+        <MudItem>
+            <div>
+                <MudButton OnClick="OnValidSubmit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">ثبت
+                    کالا
+                </MudButton>
+                <MudButton OnClick="CancelEdit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto"> انصراف
+                </MudButton>
+            </div>
         </MudItem>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-                <MudNumericField HideSpinButtons="true" @bind-Value="intValue" Label="موجودی" Variant="Variant.Text"
-                    Min="0" Required="true" RequiredError="موجودی الزامیست"/>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-                <MudNumericField HideSpinButtons="true" @bind-Value="intValuep" Label="قیمت (ریال)"
-                    Variant="Variant.Text" Min="0" Required="true" Adornment="Adornment.End" AdornmentText="ریال" RequiredError="قیمت الزامیست"/>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="4">
-        @* <div class="" dir="ltr">
-        <label dir="ltr" style="direction: ltr !important;">Email</label> *@
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-                <MudTextField T="string" Label="ایمیل" Required="true" RequiredError="ایمیل الزامیست"
-                              Validation="@(new EmailAddressAttribute() {ErrorMessage = "ایمیل نامعتبر است"})" InputType="InputType.Email"/>
-            </MudPaper>
-        @* </div> *@
-        </MudItem>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-                <MudDatePicker Label="تاریخ شروع نمایش" Editable="true" @bind-Date="_dates" Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="از" Variant="Variant.Outlined" />
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-                <MudDatePicker Label="تاریخ پایان نمایش" Editable="true" @bind-Date="_datef" Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="تا" Variant="Variant.Outlined" />
-            </MudPaper>
-           
-        </MudItem>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-            <MudTextField @bind-Value="_filep" Label="تصویر کالا" Variant="Variant.Text" TextUpdateSuppression=false ReadOnly Required RequiredError="تصویر کالا الزامیست">
-                </MudTextField>
-                <MudFileUpload T="IBrowserFile" Required="true" FilesChanged="UploadFilep">
-    <ActivatorContent>
-        <MudFab Color="Color.Primary" EndIcon="@Icons.Material.Filled.CloudUpload" Size="Size.Small"/>
-    </ActivatorContent>
-    @* <SelectedTemplate>
-        @if (context != null)
-        {
-            <MudText>@context.Name</MudText>
-        }
-    </SelectedTemplate> *@
-</MudFileUpload>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-                <MudTextField @bind-Value="_file" Label="کاتالوگ کالا" Variant="Variant.Text" TextUpdateSuppression=false ReadOnly >
-                </MudTextField>
-                <MudFileUpload T="IBrowserFile" Required="true" FilesChanged="UploadFiles">
-    <ActivatorContent>
-        <MudFab Color="Color.Primary" EndIcon="@Icons.Material.Filled.CloudUpload" Size="Size.Small"/>
-    </ActivatorContent>
-</MudFileUpload>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="4">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
-                <MudColorPicker Label="رنگ بندی محصول" @bind-Text="_colorValue" Style="@($"color: {_colorValue};")" Placeholder="انتخاب رنگ" />
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+
+    </MudForm>
+</MudPaper>
+
+<MudTable Items="@Elements" Hover="true" Breakpoint="Breakpoint.Sm">
+    <HeaderContent>
+        <MudTh>نام کالا</MudTh>
+        <MudTh>نام دسته بندی</MudTh>
+        <MudTh>نام برند</MudTh>
+        <MudTh>نام تامین کننده</MudTh>
+        <MudTh>ایمیل</MudTh>
+        <MudTh>قیمت</MudTh>
+        <MudTh>موجودی</MudTh>
+        <MudTh>تاریخ شروع</MudTh>
+        <MudTh>تاریخ پایان</MudTh>
+        <MudTh>تصویر</MudTh>
+        <MudTh>کاتالوگ</MudTh>
+        <MudTh>رنگ</MudTh>
+        <MudTh>ویرایش</MudTh>
+        <MudTh>حذف</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+
+        <MudTd>@context.TextValue</MudTd>
+        <MudTd>@context.SelectedValue</MudTd>
+        <MudTd>@context._selectedName</MudTd>
+        <MudTd>@context.TextValueT</MudTd>
+        <MudTd>@context.email</MudTd>
+        <MudTd>@context.intValuep</MudTd>
+        <MudTd>@context.intValue</MudTd>
+        <MudTd>@context._dates?.ToString("yyyy/MM/dd")</MudTd>
+        <MudTd>@context._datef?.ToString("yyyy/MM/dd")</MudTd>
+
+        <MudTd>
+            <MudImage Src="@previewImage" Alt="Mony the dog" Elevation="25" Class="rounded-lg" Width="100" Height="70"/>
+        </MudTd>
+        <MudTd>@context._file</MudTd>
+        <MudTd>@context._colorValue</MudTd>
+        <MudTd>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="() => EditRow(context)">ویرایش
+            </MudButton>
+        </MudTd>
+        <MudTd>
+            <MudButton Color="Color.Error" Variant="Variant.Filled" @onclick="() => OnButtonClicked(context)">حذف
+            </MudButton>
+        </MudTd>
+
+    </RowTemplate>
+
+</MudTable>
 
 
 @code {
-    public string TextValue { get; set; }
-    public string TextValueT { get; set; }
-    public bool ReadOnly = true;
-    public bool Hover = true;
-    public string SelectedValue;
-    public int? intValue;
-    public int? intValuep;
-    private DateTime? _dates = null;
-    private DateTime? _datef = null;
-    private string _filep = null;
-    private string _file = null;
+    private MudForm form;
+    private Product model = new Product();
+    private List<Product> Elements = new List<Product>();
+    public class Product
+    {
+
+        public string TextValue;
+        public string TextValueT;
+
+        public string _selectedName;
+        public string email;
+
+        public string SelectedValue;
+        public int? intValue;
+        public int? intValuep;
+        public DateTime? _dates = null;
+        public DateTime? _datef = null;
+        public string _filep = null;
+        public string _file = null;
+        public IBrowserFile _fileps = null;
+        public IBrowserFile _files = null;
+        public string _colorValue;
+
+
+
+    }
+    private readonly string[] _name =
+    [
+    "دهکده بردگیم", "چارپایه", "فان تایمز"
+    ];
+    private async Task OnValidSubmit()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            if (editItem == null)
+            {
+
+                var newItem = new Product
+                {
+                    TextValue = model.TextValue,
+                    SelectedValue = model.SelectedValue,
+                    _selectedName = model._selectedName,
+                    TextValueT = model.TextValueT,
+                    email = model.email,
+                    intValue = model.intValue,
+                    intValuep = model.intValuep,
+                    _dates = model._dates,
+                    _datef = model._datef,
+                    _file = model._file,
+                    _filep = model._filep,
+                    _colorValue = model._colorValue
+                };
+
+                Elements.Add(newItem);
+                model = new Product();
+                StateHasChanged();
+                Snackbar.Add("کالا با موفقیت اضافه شد.", Severity.Success);
+            }
+            else
+            {
+                SaveEdit(editItem);
+            }
+        }
+    }
+
+
+    private CultureInfo GetPersianCulture()
+    {
+        var culture = new CultureInfo("fa-IR");
+        DateTimeFormatInfo formatInfo = culture.DateTimeFormat;
+        formatInfo.AbbreviatedDayNames = new[] { "ی", "د", "س", "چ", "پ", "ج", "ش" };
+        formatInfo.DayNames = new[] { "یکشنبه", "دوشنبه", "سه شنبه", "چهار شنبه", "پنجشنبه", "جمعه", "شنبه" };
+        var monthNames = new[]
+        {
+"فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن",
+"اسفند",
+"",
+};
+        formatInfo.AbbreviatedMonthNames =
+        formatInfo.MonthNames =
+        formatInfo.MonthGenitiveNames = formatInfo.AbbreviatedMonthGenitiveNames = monthNames;
+        formatInfo.AMDesignator = "ق.ظ";
+        formatInfo.PMDesignator = "ب.ظ";
+        formatInfo.ShortDatePattern = "yyyy/MM/dd";
+        formatInfo.LongDatePattern = "dddd, dd MMMM,yyyy";
+        formatInfo.FirstDayOfWeek = DayOfWeek.Saturday;
+        Calendar cal = new PersianCalendar();
+        FieldInfo fieldInfo = culture.GetType().GetField("calendar", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (fieldInfo != null)
+            fieldInfo.SetValue(culture, cal);
+        FieldInfo info = formatInfo.GetType().GetField("calendar", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (info != null)
+            info.SetValue(formatInfo, cal);
+        culture.NumberFormat.NumberDecimalSeparator = "/";
+        culture.NumberFormat.DigitSubstitution = DigitShapes.NativeNational;
+        culture.NumberFormat.NumberNegativePattern = 0;
+        return culture;
+    }
+    private string Dates(DateTime? date)
+    {
+        if (date == null || model._dates == null)
+        {
+            return null;
+        }
+
+        if (date > model._dates)
+        {
+            return null;
+        }
+        if (date < model._dates)
+        {
+            return "تاریخ پایان باید بعد از شروع باشد.";
+        }
+        return null;
+    }
     private void UploadFilep(IBrowserFile file)
     {
-        _filep = file.Name;
+        if (file.ContentType.StartsWith("image/"))
+        {
+            model._filep = file.Name;
+            model._fileps = file;
+        }
+        else
+        {
+            Snackbar.Add("باید تصویر باشد.", Severity.Info);
+        }
     }
     private void UploadFiles(IBrowserFile file)
     {
-        _file = file.Name;
+        if (file.ContentType.StartsWith("image/"))
+        {
+            model._file = file.Name;
+            model._files = file;
+        }
+        else
+        {
+            Snackbar.Add("باید تصویر باشد.", Severity.Info);
+        }
     }
-     private string _colorValue;
-      private string _selectedName;
-    private readonly string[] _name =
-    [
-        "دهکده بردگیم", "چارپایه", "فان تایمز"
-    ];
+    private IDialogService DialogService { get; set; }
+    private async Task OnButtonClicked(Product model)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+        "اخطار!",
+        "مشخصات کالا حذف خواهد شد",
+        yesText: "حذف", cancelText: "بازگشت");
+        if (result == true)
+        {
+            Elements.Remove(model);
+            StateHasChanged();
+        }
+    }
+    private Product? editItem;
+
+    private void EditRow(Product item)
+    {
+        editItem = item;
+        model = new Product
+        {
+            TextValue = item.TextValue,
+            SelectedValue = item.SelectedValue,
+            _selectedName = item._selectedName,
+            TextValueT = item.TextValueT,
+            email = item.email,
+            intValue = item.intValue,
+            intValuep = item.intValuep,
+            _dates = item._dates,
+            _datef = item._datef,
+            _file = item._file,
+            _filep = item._filep,
+            _colorValue = item._colorValue
+        };
+    }
+
+    private void SaveEdit(Product original)
+    {
+        original.TextValue = model.TextValue;
+        original.SelectedValue = model.SelectedValue;
+        original._selectedName = model._selectedName;
+        original.TextValueT = model.TextValueT;
+        original.email = model.email;
+        original.intValue = model.intValue;
+        original.intValuep = model.intValuep;
+        original._dates = model._dates;
+        original._datef = model._datef;
+        original._file = model._file;
+        original._filep = model._filep;
+        original._colorValue = model._colorValue;
+
+        editItem = null;
+        model = new Product();
+        Snackbar.Add("ویرایش با موفقیت انجام شد.", Severity.Success);
+        StateHasChanged();
+    }
+
+
+    private void CancelEdit()
+    {
+        editItem = null;
+        model = new Product();
+    }
+    private string? previewImage;
+
+    private async Task HandleFileChange(IBrowserFile file)
+    {
+        if (file == null) return;
+        if (file.ContentType.StartsWith("image/"))
+        {
+            model._filep = file.Name;
+            model._fileps = file;
+            using var stream = file.OpenReadStream(maxAllowedSize: 5_000_000);
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+
+            previewImage = $"data:{file.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
+        }
+        else
+        {
+            Snackbar.Add("باید تصویر باشد.", Severity.Info);
+        }
+        
+    }
+}
 }

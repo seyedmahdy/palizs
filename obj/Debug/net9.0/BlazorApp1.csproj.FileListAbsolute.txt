@@ -94,3 +94,4 @@ d:\blazor\BlazorApp1\obj\Debug\net9.0\BlazorApp1.csproj.Up2Date
 d:\blazor\BlazorApp1\obj\Debug\net9.0\compressed\ysu4imbah3-2m64rwg9pw.gz
 d:\blazor\BlazorApp1\obj\Debug\net9.0\compressed\uxxncn5hnr-2m64rwg9pw.gz
 d:\blazor\BlazorApp1\obj\Debug\net9.0\compressed\psnyflj9j1-9qrwk46u39.gz
+D:\blazor\BlazorApp1\obj\Debug\net9.0\BlazorApp1.sourcelink.json
