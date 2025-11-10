@@ -1,20 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@* 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div> *@
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
@@ -22,35 +6,35 @@
     <span class="dismiss">🗙</span>
 </div>
 <MudRTLProvider RightToLeft="true">
-@* Required *@
-<MudThemeProvider />
-<MudPopoverProvider />
+    @* Required *@
+    <MudThemeProvider />
+    <MudPopoverProvider />
 
-@* Needed for dialogs *@
-<MudDialogProvider />
+    @* Needed for dialogs *@
+    <MudDialogProvider />
 
-@* Needed for snackbars *@
-<MudSnackbarProvider />
+    @* Needed for snackbars *@
+    <MudSnackbarProvider />
 
-<MudLayout>
-    <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        My Application
-    </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen">
-        <div class="sidebar">
-        <NavMenu />
-    </div>
-    </MudDrawer>
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Medium">
-        @Body
-    
-    </MudContainer>
-    </MudMainContent>
-</MudLayout>
+    <MudLayout>
+        <MudAppBar>
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            My Application
+        </MudAppBar>
+        <MudDrawer @bind-Open="@_drawerOpen">
+            <div class="sidebar">
+                <NavMenu />
+            </div>
+        </MudDrawer>
+        <MudMainContent>
+            <MudContainer MaxWidth="MaxWidth.Medium">
+                @Body
 
-@* <MudLayout>
+            </MudContainer>
+        </MudMainContent>
+    </MudLayout>
+
+    @* <MudLayout>
     <MudAppBar>
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         My Application
@@ -64,7 +48,7 @@
 
 </MudRTLProvider>
 @code {
-    
+
     public bool _drawerOpen = false;
 
     private void DrawerToggle()
