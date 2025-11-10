@@ -645,24 +645,31 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\COMPUTER-JOKAR\\.nuget\\packages\\": {}
+    "C:\\Users\\Seyed\\.nuget\\packages\\": {},
+    "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "d:\\blazor\\BlazorApp1\\BlazorApp1.csproj",
+      "projectUniqueName": "D:\\paliz\\BlazorApp1\\BlazorApp1.csproj",
       "projectName": "BlazorApp1",
-      "projectPath": "d:\\blazor\\BlazorApp1\\BlazorApp1.csproj",
-      "packagesPath": "C:\\Users\\COMPUTER-JOKAR\\.nuget\\packages\\",
-      "outputPath": "d:\\blazor\\BlazorApp1\\obj\\",
+      "projectPath": "D:\\paliz\\BlazorApp1\\BlazorApp1.csproj",
+      "packagesPath": "C:\\Users\\Seyed\\.nuget\\packages\\",
+      "outputPath": "D:\\paliz\\BlazorApp1\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\COMPUTER-JOKAR\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Seyed\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
