@@ -1,18 +1,22 @@
 ﻿@using System.ComponentModel.DataAnnotations
 @using System.Globalization
 @using System.Reflection
+@using System.IO;
+@inject HttpClient Http
+@inject IWebHostEnvironment Env
+
 @inject ISnackbar Snackbar
 <h3>افزودن کالا</h3>
 @page "/commodity"
 
-
+<p>@message</p>
 <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 p-3">
     <MudForm @ref="form">
         <MudGrid>
             <MudItem xs="4">
 
                 <MudTextField @bind-Value="model.TextValue" Label="کالا" Variant="Variant.Text" Required="true"
-                    RequiredError="نام کالا الزامیست">
+                              RequiredError="نام کالا الزامیست">
                 </MudTextField>
 
             </MudItem>
@@ -21,8 +25,8 @@
                 <div>
 
                     <MudTextField @bind-Value="@model.SelectedValue" TextUpdateSuppression=false Label="نام دسته بندی"
-                        Variant="Variant.Text" Required="true" ReadOnly="true" RequiredError="نام دسته بندی الزامیست"
-                        For="@(() => model.SelectedValue)" />
+                                  Variant="Variant.Text" Required="true" ReadOnly="true" RequiredError="نام دسته بندی الزامیست"
+                                  For="@(() => model.SelectedValue)" />
                     <MudTreeView Hover ReadOnly="false" @bind-SelectedValue="@model.SelectedValue" Required="true">
                         <MudTreeViewItem Value="@("بازی")">
                             <MudTreeViewItem Value='"بردگیم"' />
@@ -38,7 +42,7 @@
             <MudItem xs="4">
 
                 <MudSelect @bind-Value="model._selectedName" Label="نام برند" Variant="Variant.Text" Required
-                    RequiredError="نام برند الزامیست" For="@(() => model._selectedName)">
+                           RequiredError="نام برند الزامیست" For="@(() => model._selectedName)">
                     @foreach (var name in _name)
                     {
                         <MudSelectItem Value="@name">@name</MudSelectItem>
@@ -55,47 +59,47 @@
             <MudItem xs="4">
 
                 <MudNumericField HideSpinButtons="true" @bind-Value="model.intValue" Label="موجودی"
-                    Variant="Variant.Text" Min="0" Required="true" RequiredError="موجودی الزامیست" />
+                                 Variant="Variant.Text" Min="0" Required="true" RequiredError="موجودی الزامیست" />
 
             </MudItem>
             <MudItem xs="4">
 
                 <MudNumericField HideSpinButtons="true" @bind-Value="model.intValuep" Label="قیمت (ریال)"
-                    Variant="Variant.Text" Min="0" Required="true" Adornment="Adornment.End" AdornmentText="ریال"
-                    RequiredError="قیمت الزامیست" />
+                                 Variant="Variant.Text" Min="0" Required="true" Adornment="Adornment.End" AdornmentText="ریال"
+                                 RequiredError="قیمت الزامیست" />
 
             </MudItem>
             <MudItem xs="4">
                 <MudTextField T="string" Label="ایمیل"
-                    Validation="@(new EmailAddressAttribute() {ErrorMessage = "ایمیل نامعتبر است"})"
-                    InputType="InputType.Email" @bind-Value="model.email" />
+                              Validation="@(new EmailAddressAttribute() {ErrorMessage = "ایمیل نامعتبر است"})"
+                              InputType="InputType.Email" @bind-Value="model.email" />
 
 
             </MudItem>
             <MudItem xs="4">
 
                 <MudDatePicker Label="تاریخ شروع نمایش" Editable="true" @bind-Date="model._dates"
-                    Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="از"
-                    Variant="Variant.Outlined" Culture="@GetPersianCulture()" />
+                               Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="از"
+                               Variant="Variant.Outlined" Culture="@GetPersianCulture()" />
 
             </MudItem>
             <MudItem xs="4">
 
                 <MudDatePicker Label="تاریخ پایان نمایش" Editable="true" @bind-Date="model._datef"
-                    Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="تا"
-                    Variant="Variant.Outlined" Culture="@GetPersianCulture()" Validation="Dates" />
+                               Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="تا"
+                               Variant="Variant.Outlined" Culture="@GetPersianCulture()" Validation="Dates" />
 
 
             </MudItem>
             <MudItem xs="4">
                 <div Class="d-flex align-center justify-center mud-width-full py-8">
                     <MudTextField @bind-Value="model._filep" Label="تصویر کالا" Variant="Variant.Text"
-                        TextUpdateSuppression=false ReadOnly Required RequiredError="تصویر کالا الزامیست">
+                                  TextUpdateSuppression=false ReadOnly Required RequiredError="تصویر کالا الزامیست">
                     </MudTextField>
                     <MudFileUpload T="IBrowserFile" FilesChanged="@(async file => await HandleFileChange(file))">
                         <ActivatorContent>
                             <MudFab Color="Color.Primary" EndIcon="@Icons.Material.Filled.CloudUpload"
-                                Size="Size.Small" />
+                                    Size="Size.Small" />
                         </ActivatorContent>
                     </MudFileUpload>
                 </div>
@@ -103,12 +107,12 @@
             <MudItem xs="4">
                 <div Class="d-flex align-center justify-center mud-width-full py-8">
                     <MudTextField @bind-Value="model._file" Label="کاتالوگ کالا" Variant="Variant.Text"
-                        TextUpdateSuppression=false ReadOnly>
+                                  TextUpdateSuppression=false ReadOnly>
                     </MudTextField>
                     <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
                         <ActivatorContent>
                             <MudFab Color="Color.Primary" EndIcon="@Icons.Material.Filled.CloudUpload"
-                                Size="Size.Small" />
+                                    Size="Size.Small" />
                         </ActivatorContent>
                     </MudFileUpload>
                 </div>
@@ -116,17 +120,19 @@
             <MudItem xs="4">
 
                 <MudColorPicker Label="رنگ بندی محصول" @bind-Text="model._colorValue"
-                    Style="@($"color: {model._colorValue};")" Placeholder="انتخاب رنگ" />
+                                Style="@($"color: {model._colorValue};")" Placeholder="انتخاب رنگ" />
 
             </MudItem>
 
         </MudGrid>
         <MudItem>
             <div>
-                <MudButton OnClick="OnValidSubmit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">ثبت
+                <MudButton OnClick="OnValidSubmit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                    ثبت
                     کالا
                 </MudButton>
-                <MudButton OnClick="CancelEdit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto"> انصراف
+                <MudButton OnClick="CancelEdit" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto">
+                    انصراف
                 </MudButton>
             </div>
         </MudItem>
@@ -164,22 +170,29 @@
         <MudTd>@context._datef?.ToString("yyyy/MM/dd")</MudTd>
 
         <MudTd>
-            <MudImage Src="@previewImage" Alt="Mony the dog" Elevation="25" Class="rounded-lg" Width="100" Height="70"/>
+            <a href="uploads/@context._filep" download="@context._filep">
+                <MudImage Src="@("uploads/"+context._filep)" Alt="Mony the dog" Elevation="25" Class="rounded-lg" Width="100" Height="70" />
+            </a>
         </MudTd>
         <MudTd>@context._file</MudTd>
         <MudTd>@context._colorValue</MudTd>
         <MudTd>
-            <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="() => EditRow(context)">ویرایش
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="() => EditRow(context)">
+                ویرایش
             </MudButton>
         </MudTd>
         <MudTd>
-            <MudButton Color="Color.Error" Variant="Variant.Filled" @onclick="() => OnButtonClicked(context)">حذف
+            <MudButton Color="Color.Error" Variant="Variant.Filled" @onclick="() => OnButtonClicked(context)">
+                حذف
             </MudButton>
         </MudTd>
 
     </RowTemplate>
 
 </MudTable>
+<button class="btn btn-primary" @onclick="RetrieveGet">
+    GET
+</button>
 
 
 @code {
@@ -258,10 +271,10 @@
         formatInfo.DayNames = new[] { "یکشنبه", "دوشنبه", "سه شنبه", "چهار شنبه", "پنجشنبه", "جمعه", "شنبه" };
         var monthNames = new[]
         {
-"فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن",
-"اسفند",
-"",
-};
+            "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن",
+            "اسفند",
+            "",
+        };
         formatInfo.AbbreviatedMonthNames =
         formatInfo.MonthNames =
         formatInfo.MonthGenitiveNames = formatInfo.AbbreviatedMonthGenitiveNames = monthNames;
@@ -323,7 +336,7 @@
             Snackbar.Add("باید تصویر باشد.", Severity.Info);
         }
     }
-    private IDialogService DialogService { get; set; }
+    [Inject]private IDialogService DialogService { get; set; }
     private async Task OnButtonClicked(Product model)
     {
         bool? result = await DialogService.ShowMessageBox(
@@ -333,6 +346,7 @@
         if (result == true)
         {
             Elements.Remove(model);
+            File.Delete(Env.WebRootPath +"/uploads/" + model._filep);
             StateHasChanged();
         }
     }
@@ -385,7 +399,6 @@
         editItem = null;
         model = new Product();
     }
-    private string? previewImage;
 
     private async Task HandleFileChange(IBrowserFile file)
     {
@@ -398,13 +411,24 @@
             using var ms = new MemoryStream();
             await stream.CopyToAsync(ms);
 
-            previewImage = $"data:{file.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
+            var uploadsFolder = Path.Combine(Env.WebRootPath, "uploads");
+
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var savePath = Path.Combine(uploadsFolder, file.Name);
+            File.WriteAllBytes(savePath, ms.ToArray());
         }
         else
         {
             Snackbar.Add("باید تصویر باشد.", Severity.Info);
         }
-        
+
+    }
+    string message = "grgerge";
+    private async Task RetrieveGet()
+    {
+      message = await Http.GetStringAsync("https://localhost:7242/api/hi/1");
     }
 
 }
