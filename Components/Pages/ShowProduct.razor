@@ -1,0 +1,31 @@
+﻿@page "/showproduct/{Id}"
+@using BlazorApp1.Models
+@inject HttpClient Http
+
+@if (product == null)
+{
+    <p>در حال بارگذاری...</p>
+}
+else
+{
+    <div>
+        <p><strong>شناسه:</strong> @product.Id</p>
+        <p><strong>نام:</strong> @product.ProductName</p>
+        <p><strong>قیمت:</strong> @product.Price</p>
+        <p><strong>دسته‌بندی:</strong> @product.CategoryName</p>
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private Product product;
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await Http.GetFromJsonAsync<Product>($"api/product/show/{Id}");
+    }
+}

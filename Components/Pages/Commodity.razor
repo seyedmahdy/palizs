@@ -2,6 +2,7 @@
 @using System.Globalization
 @using System.Reflection
 @using System.IO;
+@using BlazorApp1.Models
 @inject HttpClient Http
 @inject IWebHostEnvironment Env
 
@@ -9,13 +10,12 @@
 <h3>افزودن کالا</h3>
 @page "/commodity"
 
-<p>@message</p>
 <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 p-3">
     <MudForm @ref="form">
         <MudGrid>
             <MudItem xs="4">
 
-                <MudTextField @bind-Value="model.TextValue" Label="کالا" Variant="Variant.Text" Required="true"
+                <MudTextField @bind-Value="model.ProductName" Label="کالا" Variant="Variant.Text" Required="true"
                               RequiredError="نام کالا الزامیست">
                 </MudTextField>
 
@@ -24,10 +24,10 @@
 
                 <div>
 
-                    <MudTextField @bind-Value="@model.SelectedValue" TextUpdateSuppression=false Label="نام دسته بندی"
+                    <MudTextField @bind-Value="@model.CategoryName" TextUpdateSuppression=false Label="نام دسته بندی"
                                   Variant="Variant.Text" Required="true" ReadOnly="true" RequiredError="نام دسته بندی الزامیست"
-                                  For="@(() => model.SelectedValue)" />
-                    <MudTreeView Hover ReadOnly="false" @bind-SelectedValue="@model.SelectedValue" Required="true">
+                                  For="@(() => model.CategoryName)" />
+                    <MudTreeView Hover ReadOnly="false" @bind-SelectedValue="@model.CategoryName" Required="true">
                         <MudTreeViewItem Value="@("بازی")">
                             <MudTreeViewItem Value='"بردگیم"' />
                             <MudTreeViewItem Value='"ویدیوگیم"' />
@@ -41,8 +41,8 @@
             </MudItem>
             <MudItem xs="4">
 
-                <MudSelect @bind-Value="model._selectedName" Label="نام برند" Variant="Variant.Text" Required
-                           RequiredError="نام برند الزامیست" For="@(() => model._selectedName)">
+                <MudSelect @bind-Value="model.BrandName" Label="نام برند" Variant="Variant.Text" Required
+                           RequiredError="نام برند الزامیست" For="@(() => model.BrandName)">
                     @foreach (var name in _name)
                     {
                         <MudSelectItem Value="@name">@name</MudSelectItem>
@@ -52,19 +52,19 @@
             </MudItem>
             <MudItem xs="4">
 
-                <MudTextField @bind-Value="model.TextValueT" Label="نام تامین کننده" Variant="Variant.Text">
+                <MudTextField @bind-Value="model.SupplierName" Label="نام تامین کننده" Variant="Variant.Text">
                 </MudTextField>
 
             </MudItem>
             <MudItem xs="4">
 
-                <MudNumericField HideSpinButtons="true" @bind-Value="model.intValue" Label="موجودی"
+                <MudNumericField HideSpinButtons="true" @bind-Value="model.Supply" Label="موجودی"
                                  Variant="Variant.Text" Min="0" Required="true" RequiredError="موجودی الزامیست" />
 
             </MudItem>
             <MudItem xs="4">
 
-                <MudNumericField HideSpinButtons="true" @bind-Value="model.intValuep" Label="قیمت (ریال)"
+                <MudNumericField HideSpinButtons="true" @bind-Value="model.Price" Label="قیمت (ریال)"
                                  Variant="Variant.Text" Min="0" Required="true" Adornment="Adornment.End" AdornmentText="ریال"
                                  RequiredError="قیمت الزامیست" />
 
@@ -72,20 +72,20 @@
             <MudItem xs="4">
                 <MudTextField T="string" Label="ایمیل"
                               Validation="@(new EmailAddressAttribute() {ErrorMessage = "ایمیل نامعتبر است"})"
-                              InputType="InputType.Email" @bind-Value="model.email" />
+                              InputType="InputType.Email" @bind-Value="model.Email" />
 
 
             </MudItem>
             <MudItem xs="4">
 
-                <MudDatePicker Label="تاریخ شروع نمایش" Editable="true" @bind-Date="model._dates"
+                <MudDatePicker Label="تاریخ شروع نمایش" Editable="true" @bind-Date="model.StartDate"
                                Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="از"
                                Variant="Variant.Outlined" Culture="@GetPersianCulture()" />
 
             </MudItem>
             <MudItem xs="4">
 
-                <MudDatePicker Label="تاریخ پایان نمایش" Editable="true" @bind-Date="model._datef"
+                <MudDatePicker Label="تاریخ پایان نمایش" Editable="true" @bind-Date="model.EndDate"
                                Mask="@(new DateMask("0000/00/00"))" DateFormat="yyyy-MM-dd" Placeholder="تا"
                                Variant="Variant.Outlined" Culture="@GetPersianCulture()" Validation="Dates" />
 
@@ -93,7 +93,7 @@
             </MudItem>
             <MudItem xs="4">
                 <div Class="d-flex align-center justify-center mud-width-full py-8">
-                    <MudTextField @bind-Value="model._filep" Label="تصویر کالا" Variant="Variant.Text"
+                    <MudTextField @bind-Value="model.ImageName" Label="تصویر کالا" Variant="Variant.Text"
                                   TextUpdateSuppression=false ReadOnly Required RequiredError="تصویر کالا الزامیست">
                     </MudTextField>
                     <MudFileUpload T="IBrowserFile" FilesChanged="@(async file => await HandleFileChange(file))">
@@ -106,7 +106,7 @@
             </MudItem>
             <MudItem xs="4">
                 <div Class="d-flex align-center justify-center mud-width-full py-8">
-                    <MudTextField @bind-Value="model._file" Label="کاتالوگ کالا" Variant="Variant.Text"
+                    <MudTextField @bind-Value="model.CatalogueName" Label="کاتالوگ کالا" Variant="Variant.Text"
                                   TextUpdateSuppression=false ReadOnly>
                     </MudTextField>
                     <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
@@ -119,8 +119,8 @@
             </MudItem>
             <MudItem xs="4">
 
-                <MudColorPicker Label="رنگ بندی محصول" @bind-Text="model._colorValue"
-                                Style="@($"color: {model._colorValue};")" Placeholder="انتخاب رنگ" />
+                <MudColorPicker Label="رنگ بندی محصول" @bind-Text="model.Color"
+                                Style="@($"color: {model.Color};")" Placeholder="انتخاب رنگ" />
 
             </MudItem>
 
@@ -156,26 +156,27 @@
         <MudTh>رنگ</MudTh>
         <MudTh>ویرایش</MudTh>
         <MudTh>حذف</MudTh>
+        <MudTd>لینک</MudTd>
     </HeaderContent>
     <RowTemplate>
 
-        <MudTd>@context.TextValue</MudTd>
-        <MudTd>@context.SelectedValue</MudTd>
-        <MudTd>@context._selectedName</MudTd>
-        <MudTd>@context.TextValueT</MudTd>
-        <MudTd>@context.email</MudTd>
-        <MudTd>@context.intValuep</MudTd>
-        <MudTd>@context.intValue</MudTd>
-        <MudTd>@context._dates?.ToString("yyyy/MM/dd")</MudTd>
-        <MudTd>@context._datef?.ToString("yyyy/MM/dd")</MudTd>
+        <MudTd>@context.ProductName</MudTd>
+        <MudTd>@context.CategoryName</MudTd>
+        <MudTd>@context.BrandName</MudTd>
+        <MudTd>@context.SupplierName</MudTd>
+        <MudTd>@context.Email</MudTd>
+        <MudTd>@context.Price</MudTd>
+        <MudTd>@context.Supply</MudTd>
+        <MudTd>@context.StartDate?.ToString("yyyy/MM/dd")</MudTd>
+        <MudTd>@context.EndDate?.ToString("yyyy/MM/dd")</MudTd>
 
         <MudTd>
-            <a href="uploads/@context._filep" download="@context._filep">
-                <MudImage Src="@("uploads/"+context._filep)" Alt="Mony the dog" Elevation="25" Class="rounded-lg" Width="100" Height="70" />
+            <a href="uploads/@context.ImageName" download="@context.ImageName">
+                <MudImage Src="@("uploads/"+context.ImageName)" Alt="Mony the dog" Elevation="25" Class="rounded-lg" Width="100" Height="70" />
             </a>
         </MudTd>
-        <MudTd>@context._file</MudTd>
-        <MudTd>@context._colorValue</MudTd>
+        <MudTd>@context.CatalogueName</MudTd>
+        <MudTd>@context.Color</MudTd>
         <MudTd>
             <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="() => EditRow(context)">
                 ویرایش
@@ -186,42 +187,25 @@
                 حذف
             </MudButton>
         </MudTd>
+        <MudTd>
+            <a class="btn btn-primary" href="showproduct/@context.Id">
+                مشاهده جزئیات
+            </a>
+
+        </MudTd>
 
     </RowTemplate>
 
 </MudTable>
-<button class="btn btn-primary" @onclick="RetrieveGet">
-    GET
-</button>
+
 
 
 @code {
     private MudForm form;
     private Product model = new Product();
-    private List<Product> Elements = new List<Product>();
-    public class Product
-    {
+    private List<Product> Elements;
+    private Product newProduct;
 
-        public string TextValue;
-        public string TextValueT;
-
-        public string _selectedName;
-        public string email;
-
-        public string SelectedValue;
-        public int? intValue;
-        public int? intValuep;
-        public DateTime? _dates = null;
-        public DateTime? _datef = null;
-        public string _filep = null;
-        public string _file = null;
-        public IBrowserFile _fileps = null;
-        public IBrowserFile _files = null;
-        public string _colorValue;
-
-
-
-    }
     private readonly string[] _name =
     [
     "دهکده بردگیم", "چارپایه", "فان تایمز"
@@ -234,23 +218,25 @@
             if (editItem == null)
             {
 
-                var newItem = new Product
+                newProduct = new Product
                 {
-                    TextValue = model.TextValue,
-                    SelectedValue = model.SelectedValue,
-                    _selectedName = model._selectedName,
-                    TextValueT = model.TextValueT,
-                    email = model.email,
-                    intValue = model.intValue,
-                    intValuep = model.intValuep,
-                    _dates = model._dates,
-                    _datef = model._datef,
-                    _file = model._file,
-                    _filep = model._filep,
-                    _colorValue = model._colorValue
+                    ProductName = model.ProductName,
+                    CategoryName = model.CategoryName,
+                    BrandName = model.BrandName,
+                    SupplierName = model.SupplierName,
+                    Email = model.Email,
+                    Supply = model.Supply,
+                    Price = model.Price,
+                    StartDate = model.StartDate,
+                    EndDate = model.EndDate,
+                    CatalogueName = model.CatalogueName,
+                    ImageName = model.ImageName,
+                    Color = model.Color,
+
                 };
 
-                Elements.Add(newItem);
+                // Elements.Add(newItem);
+                AddNewProduct();
                 model = new Product();
                 StateHasChanged();
                 Snackbar.Add("کالا با موفقیت اضافه شد.", Severity.Success);
@@ -297,16 +283,16 @@
     }
     private string Dates(DateTime? date)
     {
-        if (date == null || model._dates == null)
+        if (date == null || model.StartDate == null)
         {
             return null;
         }
 
-        if (date > model._dates)
+        if (date > model.StartDate)
         {
             return null;
         }
-        if (date < model._dates)
+        if (date < model.StartDate)
         {
             return "تاریخ پایان باید بعد از شروع باشد.";
         }
@@ -316,8 +302,8 @@
     {
         if (file.ContentType.StartsWith("image/"))
         {
-            model._filep = file.Name;
-            model._fileps = file;
+            model.ImageName = file.Name;
+            
         }
         else
         {
@@ -328,8 +314,8 @@
     {
         if (file.ContentType.StartsWith("image/"))
         {
-            model._file = file.Name;
-            model._files = file;
+            model.CatalogueName = file.Name;
+            
         }
         else
         {
@@ -345,8 +331,16 @@
         yesText: "حذف", cancelText: "بازگشت");
         if (result == true)
         {
-            Elements.Remove(model);
-            File.Delete(Env.WebRootPath +"/uploads/" + model._filep);
+            // Elements.Remove(model);
+            DeleteProduct(model.Id);
+            // var filePath = Path.Combine(Env.WebRootPath, "uploads", model.ImageName);
+
+            if (model.ImageName != null)
+            {
+                File.Delete(Env.WebRootPath + "/uploads/" + model.ImageName);
+            }
+
+            // File.Delete(Env.WebRootPath +"/uploads/" + model.ImageName);
             StateHasChanged();
         }
     }
@@ -357,40 +351,41 @@
         editItem = item;
         model = new Product
         {
-            TextValue = item.TextValue,
-            SelectedValue = item.SelectedValue,
-            _selectedName = item._selectedName,
-            TextValueT = item.TextValueT,
-            email = item.email,
-            intValue = item.intValue,
-            intValuep = item.intValuep,
-            _dates = item._dates,
-            _datef = item._datef,
-            _file = item._file,
-            _filep = item._filep,
-            _colorValue = item._colorValue
+            ProductName = item.ProductName,
+            CategoryName = item.CategoryName,
+            BrandName = item.BrandName,
+            SupplierName = item.SupplierName,
+            Email = item.Email,
+            Supply = item.Supply,
+            Price = item.Price,
+            StartDate = item.StartDate,
+            EndDate = item.EndDate,
+            CatalogueName = item.CatalogueName,
+            ImageName = item.ImageName,
+            Color = item.Color
         };
     }
 
-    private void SaveEdit(Product original)
+    private async Task SaveEdit(Product original)
     {
-        original.TextValue = model.TextValue;
-        original.SelectedValue = model.SelectedValue;
-        original._selectedName = model._selectedName;
-        original.TextValueT = model.TextValueT;
-        original.email = model.email;
-        original.intValue = model.intValue;
-        original.intValuep = model.intValuep;
-        original._dates = model._dates;
-        original._datef = model._datef;
-        original._file = model._file;
-        original._filep = model._filep;
-        original._colorValue = model._colorValue;
+        var response = await Http.PutAsJsonAsync($"api/product/edit/{original.Id}", model);
+        if (response.IsSuccessStatusCode)
+        {
+            var updatedProduct = await response.Content.ReadFromJsonAsync<Product>();
+            var index = Elements.FindIndex(p => p.Id == updatedProduct!.Id);
+            if (index >= 0)
+                Elements[index] = updatedProduct;
 
-        editItem = null;
-        model = new Product();
-        Snackbar.Add("ویرایش با موفقیت انجام شد.", Severity.Success);
-        StateHasChanged();
+            editItem = null;
+            model = new Product();
+            Snackbar.Add("ویرایش با موفقیت انجام شد.", Severity.Success);
+            StateHasChanged();
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("خطا در ویرایش: " + error);
+        }
     }
 
 
@@ -405,8 +400,8 @@
         if (file == null) return;
         if (file.ContentType.StartsWith("image/"))
         {
-            model._filep = file.Name;
-            model._fileps = file;
+            model.ImageName = file.Name;
+            // model.Image = file;
             using var stream = file.OpenReadStream(maxAllowedSize: 5_000_000);
             using var ms = new MemoryStream();
             await stream.CopyToAsync(ms);
@@ -425,10 +420,44 @@
         }
 
     }
-    string message = "grgerge";
-    private async Task RetrieveGet()
+    
+    protected override async Task OnInitializedAsync()
     {
-      message = await Http.GetStringAsync("https://localhost:7242/api/hi/1");
+        Elements = await Http.GetFromJsonAsync<List<Product>>("api/product/default");
+    }
+
+    private async Task AddNewProduct()
+    {
+        var response = await Http.PostAsJsonAsync<Product>("api/product/add", newProduct);
+        if (response.IsSuccessStatusCode)
+        {
+            var addedProduct = await response.Content.ReadFromJsonAsync<Product>();
+            Elements.Add(addedProduct);
+            newProduct = new Product();
+            StateHasChanged(); 
+        }
+        else
+        {
+    
+            Console.WriteLine("خطا در اضافه کردن محصول");
+        }
+    }
+    private async Task DeleteProduct(int? id)
+    {
+        var response = await Http.DeleteAsync($"api/product/delete/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            var productToRemove = Elements.FirstOrDefault(p => p.Id == id);
+            if (productToRemove != null)
+                Elements.Remove(productToRemove);
+
+            StateHasChanged();
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Console.WriteLine("خطا در حذف: " + error);
+        }
     }
 
 }

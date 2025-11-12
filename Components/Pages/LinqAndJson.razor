@@ -1,0 +1,43 @@
+﻿@page "/linqandjson"
+@using BlazorApp1.Models
+@using System.Text.Json
+
+<MudPaper Class="d-flex align-center justify-center mud-width-full py-8 p-3">
+    <MudItem xs="6">
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="Serialized">serialized</MudButton>
+    </MudItem>
+    <MudItem xs="1">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="Deserialized">deserialized</MudButton>
+    </MudItem>
+</MudPaper>
+<MudPaper Class="d-flex align-center justify-center mud-width-full py-8 p-3">
+    <MudItem>
+        <MudField>@json</MudField>
+    </MudItem>
+</MudPaper>
+
+
+@code {
+    private List<Product> products = new()
+    {
+        new Product { Id = 1, ProductName = "Laptop", Price = 2000, CategoryName = "Electronics" },
+        new Product { Id = 2, ProductName = "Phone", Price = 1500, CategoryName = "Electronics" }
+    };
+
+    private string json = "";
+    private List<Product>? deserializedProducts;
+    private void Serialized()
+    {
+        json = JsonSerializer.Serialize(products, new JsonSerializerOptions { WriteIndented = true });
+    }
+    private void Deserialized()
+    {
+        if (!string.IsNullOrEmpty(json))
+        {
+            deserializedProducts = JsonSerializer.Deserialize<List<Product>>(json);
+            json = "";
+        }
+        
+    }
+
+}
