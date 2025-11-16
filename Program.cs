@@ -1,6 +1,8 @@
 using BlazorApp1.Components;
+using BlazorApp1.Data;
 using BlazorApp1.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
@@ -10,6 +12,8 @@ using Serilog.Sinks.MSSqlServer;
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<ProductContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ProductContext") ?? throw new InvalidOperationException("Connection string 'ProductContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
