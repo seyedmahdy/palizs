@@ -1,26 +1,88 @@
 ﻿@page "/linqandjson"
 @using BlazorApp1.Models
 @using System.Text.Json
+@inject HttpClient Http
+@inject Serilog.ILogger Log
 
 <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 p-3">
-    <MudItem xs="6">
-    <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="Serialized">serialized</MudButton>
+    <MudItem xs="3">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="Serialized">serialized</MudButton>
     </MudItem>
-    <MudItem xs="1">
+    <MudItem xs="3">
         <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="Deserialized">deserialized</MudButton>
     </MudItem>
-</MudPaper>
-<MudPaper Class="d-flex align-center justify-center mud-width-full py-8 p-3">
+    <MudItem xs="3">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="LinqMax">max</MudButton>
+    </MudItem>
+    <MudItem>
+        <MudTextField @bind-Value="categorySearch" Required RequiredError="نام دسته بندی برای جستجو الزامیست" HelperText="@result"></MudTextField>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="LinqGroup">search </MudButton>
+    </MudItem>
+
+
     <MudItem>
         <MudField>@json</MudField>
     </MudItem>
 </MudPaper>
+<MudTable Items="@groupSearch" Hover="true" Breakpoint="Breakpoint.Sm" hidden="@(!categoryExist)">
+    <HeaderContent>
+        <MudTh>نام محصول</MudTh>
+        <MudTh>قیمت</MudTh>
+        <MudTh>دسته بندی</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.ProductName</MudTd>
+        <MudTd>@context.Price</MudTd>
+        <MudTd>@context.CategoryName</MudTd>
+    </RowTemplate>
 
+</MudTable>
+
+@* <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 p-3"> *@
+<MudForm @ref="form">
+    <MudGrid>
+        <MudItem xs="4">
+            <MudTextField @bind-Value="model.ProductName"></MudTextField>
+        </MudItem>
+        <MudItem xs="4">
+            <MudTextField @bind-Value="model.CategoryName" ReadOnly Required TextUpdateSuppression=false></MudTextField>
+            <MudTreeView @bind-SelectedValue="model.CategoryName" ReadOnly="false" Hover>
+                <MudTreeViewItem Value='"بازی"'>
+                    <MudTreeViewItem Value='"بردگیم"'/>
+                    <MudTreeViewItem Value='"ویدیوگیم"'/>
+                </MudTreeViewItem>
+            </MudTreeView>
+        </MudItem>
+        <MudItem xs="4">
+            <MudSelect @bind-Value="model.BrandName" Placeholder="برند">
+                @foreach(var name in _name)
+                {
+                    <MudSelectItem Value="@name"></MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="4">
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Valid">submit</MudButton>
+        </MudItem>
+    </MudGrid>
+</MudForm>
+@* </MudPaper> *@
 
 @code {
+    private MudForm form;
+    private readonly string[] _name =
+   [
+   "دهکده بردگیم", "چارپایه", "فان تایمز"
+   ];
+    private Product model = new Product();
+    private string categorySearch = "";
+    private List<Product> groupSearch = new();
+    private string result;
     private List<Product> products = new()
     {
         new Product { Id = 1, ProductName = "Laptop", Price = 2000, CategoryName = "Electronics" },
+        new Product { Id = 3, ProductName = "top", Price = 100, CategoryName = "ts" },
+        new Product { Id = 4, ProductName = "Lap", Price = 140, CategoryName = "ts" },
         new Product { Id = 2, ProductName = "Phone", Price = 1500, CategoryName = "Electronics" }
     };
 
@@ -37,7 +99,69 @@
             deserializedProducts = JsonSerializer.Deserialize<List<Product>>(json);
             json = "";
         }
-        
+
+    }
+    [Inject]
+    private IDialogService DialogService { get; set; }
+    private async Task LinqMax()
+    {
+        var max =
+        (from product in products
+         orderby product.Price descending
+         select product).First();
+        // var max1 = products.Max();
+        await DialogService.ShowMessageBox(
+            "گرانترین محصول",
+            $"نام محصول : {max.ProductName} \n قیمت : {max.Price}",
+            yesText: "تایید"
+        );
+    }
+    private bool categoryExist = false;
+    private void LinqGroup()
+    {
+        groupSearch.Clear();
+        var group = (
+        from product in products
+        group product by product.CategoryName);
+        foreach (var category in group)
+        {
+            if (category.Key.ToLower() == categorySearch.ToLower())
+            {
+                categoryExist = true;
+                result = "";
+                foreach (Product p in category)
+                {
+                    groupSearch.Add(p);
+
+                }
+                break;
+            }
+            else
+            {
+                categoryExist = false;
+            }
+        }
+        if (!categoryExist)
+        {
+            result = "کالایی یافت نشد";
+
+        }
+    }
+    private async Task Valid()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            model.ImageName = "rfr";
+            var response = await Http.PostAsJsonAsync<Product>("api/product/add", model);
+            if (response.IsSuccessStatusCode)
+            {
+                var newProduct = await response.Content.ReadFromJsonAsync<Product>();
+                products.Add(newProduct);
+                model = new Product();
+                Log.Information("add");
+            }
+        }
     }
 
 }

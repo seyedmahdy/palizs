@@ -1,6 +1,9 @@
 using BlazorApp1.Components;
+using BlazorApp1.Services;
 using Microsoft.AspNetCore.Builder;
 using MudBlazor.Services;
+using Serilog;
+using Serilog.Sinks.MSSqlServer;
 
 
 
@@ -21,8 +24,19 @@ builder.Services.AddScoped(sp => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7242/")
 });
-
+builder.Services.AddScoped<IProductService, ProductService>();
+Log.Logger = new LoggerConfiguration()
+           .MinimumLevel.Debug()
+           .WriteTo.Console()
+           .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day)
+           .WriteTo
+    .MSSqlServer(
+        connectionString: "Server=localhost;Database=product;Integrated Security=SSPI;TrustServerCertificate=True;",
+        sinkOptions: new MSSqlServerSinkOptions { TableName = "LogEvents" , AutoCreateSqlDatabase = true, AutoCreateSqlTable = true})
+           .CreateLogger();
+builder.Services.AddSingleton(Log.Logger);
 var app = builder.Build();
+
 
 
 

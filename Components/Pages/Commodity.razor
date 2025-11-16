@@ -5,6 +5,7 @@
 @using BlazorApp1.Models
 @inject HttpClient Http
 @inject IWebHostEnvironment Env
+@inject Services.IProductService controller
 
 @inject ISnackbar Snackbar
 <h3>افزودن کالا</h3>
@@ -303,7 +304,7 @@
         if (file.ContentType.StartsWith("image/"))
         {
             model.ImageName = file.Name;
-            
+
         }
         else
         {
@@ -315,7 +316,7 @@
         if (file.ContentType.StartsWith("image/"))
         {
             model.CatalogueName = file.Name;
-            
+
         }
         else
         {
@@ -332,6 +333,8 @@
         if (result == true)
         {
             // Elements.Remove(model);
+
+
             DeleteProduct(model.Id);
             // var filePath = Path.Combine(Env.WebRootPath, "uploads", model.ImageName);
 
@@ -420,10 +423,11 @@
         }
 
     }
-    
+
     protected override async Task OnInitializedAsync()
+
     {
-        Elements = await Http.GetFromJsonAsync<List<Product>>("api/product/default");
+        Elements =  controller.GetAll();
     }
 
     private async Task AddNewProduct()

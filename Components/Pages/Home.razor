@@ -1,7 +1,21 @@
-﻿@page "/"
+﻿
+@page "/"
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>@count</h1>
 
 Welcome to your new app.
+<Counter IncrementAmount="1" callback="@update"></Counter>
+
+
+
+
+@code{
+
+    private int count;
+    private void update(int v)
+    {
+        count = v;
+    }
+}
