@@ -204,7 +204,7 @@
 @code {
     private MudForm form;
     private Product model = new Product();
-    private List<Product> Elements;
+    private List<Product> Elements = new();
     private Product newProduct;
 
     private readonly string[] _name =
@@ -354,6 +354,7 @@
         editItem = item;
         model = new Product
         {
+            Id = item.Id,
             ProductName = item.ProductName,
             CategoryName = item.CategoryName,
             BrandName = item.BrandName,
@@ -371,13 +372,12 @@
 
     private async Task SaveEdit(Product original)
     {
-        var response = await Http.PutAsJsonAsync($"api/product/edit/{original.Id}", model);
-        if (response.IsSuccessStatusCode)
+        var response = controller.Put(original.Id, model);
+        if (response != null)
         {
-            var updatedProduct = await response.Content.ReadFromJsonAsync<Product>();
-            var index = Elements.FindIndex(p => p.Id == updatedProduct!.Id);
+            var index = Elements.FindIndex(p => p.Id == original!.Id);
             if (index >= 0)
-                Elements[index] = updatedProduct;
+                Elements[index] = model;
 
             editItem = null;
             model = new Product();
@@ -386,8 +386,8 @@
         }
         else
         {
-            var error = await response.Content.ReadAsStringAsync();
-            Console.WriteLine("خطا در ویرایش: " + error);
+          
+            Console.WriteLine("خطا در ویرایش: " );
         }
     }
 
@@ -432,24 +432,23 @@
 
     private async Task AddNewProduct()
     {
-        var response = await Http.PostAsJsonAsync<Product>("api/product/add", newProduct);
-        if (response.IsSuccessStatusCode)
+        var response = controller.Post(newProduct);
+        if (response != null)
         {
-            var addedProduct = await response.Content.ReadFromJsonAsync<Product>();
-            Elements.Add(addedProduct);
+            Elements.Add(response);
             newProduct = new Product();
             StateHasChanged(); 
         }
         else
         {
-    
+
             Console.WriteLine("خطا در اضافه کردن محصول");
         }
     }
-    private async Task DeleteProduct(int? id)
+    private async Task DeleteProduct(int id)
     {
-        var response = await Http.DeleteAsync($"api/product/delete/{id}");
-        if (response.IsSuccessStatusCode)
+        var response = controller.Delete(id);
+        if (response)
         {
             var productToRemove = Elements.FirstOrDefault(p => p.Id == id);
             if (productToRemove != null)
@@ -459,8 +458,7 @@
         }
         else
         {
-            var error = await response.Content.ReadAsStringAsync();
-            Console.WriteLine("خطا در حذف: " + error);
+            Console.WriteLine("خطا در حذف: " );
         }
     }
 

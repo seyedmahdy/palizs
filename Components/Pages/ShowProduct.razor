@@ -1,6 +1,7 @@
 ﻿@page "/showproduct/{Id}"
 @using BlazorApp1.Models
 @inject HttpClient Http
+@inject Services.IProductService controllor
 
 @if (product == null)
 {
@@ -26,6 +27,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        product = await Http.GetFromJsonAsync<Product>($"api/product/show/{Id}");
+        product = controllor.Get(Int32.Parse(Id));
     }
 }

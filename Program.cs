@@ -1,5 +1,7 @@
+
 using BlazorApp1.Components;
 using BlazorApp1.Data;
+using BlazorApp1.Repository;
 using BlazorApp1.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +31,8 @@ builder.Services.AddScoped(sp => new HttpClient
     BaseAddress = new Uri("https://localhost:7242/")
 });
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductBackService, ProductBackService>();
 Log.Logger = new LoggerConfiguration()
            .MinimumLevel.Debug()
            .WriteTo.Console()

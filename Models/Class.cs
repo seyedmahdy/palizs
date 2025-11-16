@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorApp1.Models
 {
     public class Product
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public string ProductName { get; set; }
         public string? SupplierName { get; set; }
         public string BrandName { get; set; }
